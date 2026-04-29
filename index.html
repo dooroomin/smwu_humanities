@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>나의 인문학 유형 테스트</title>
+<meta property="og:title" content="나의 인문학 유형 테스트">
+<meta property="og:description" content="16가지 유형으로 알아보는 나만의 인문학 감수성 — 3분이면 충분해요!">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans KR',sans-serif;background:#f5f4f0;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:2rem 1rem}
+  #app{width:100%;max-width:600px}
+  .card{background:#fff;border-radius:20px;padding:2rem;box-shadow:0 2px 20px rgba(0,0,0,0.07)}
+  .screen{display:none}.screen.active{display:block}
+  .prog-wrap{height:5px;background:#ede9e0;border-radius:3px;margin-bottom:1.25rem}
+  .prog-fill{height:100%;background:#7F77DD;border-radius:3px;transition:width 0.3s ease}
+  .q-num{font-size:13px;color:#888;margin-bottom:8px}
+  .q-text{font-size:17px;font-weight:600;color:#1a1a1a;line-height:1.6;margin-bottom:1.25rem}
+  .choices{display:flex;flex-direction:column;gap:10px}
+  .cbtn{padding:14px 16px;border:1.5px solid #e8e5df;border-radius:14px;background:#fff;color:#333;font-size:14px;line-height:1.5;text-align:left;cursor:pointer;transition:all 0.15s;font-family:inherit}
+  .cbtn:hover{background:#f3f1fe;border-color:#7F77DD}
+  .cbtn.sel{background:#EEEDFE;border-color:#7F77DD;color:#3C3489;font-weight:500}
+  .next-btn{display:block;width:100%;padding:14px;background:#7F77DD;color:#fff;border:none;border-radius:14px;font-size:16px;font-weight:600;cursor:pointer;margin-top:1.25rem;transition:opacity 0.15s;font-family:inherit}
+  .next-btn:disabled{opacity:0.3;cursor:not-allowed}
+  .next-btn:not(:disabled):hover{opacity:0.88}
+  .intro-emoji{font-size:52px;text-align:center;margin-bottom:1rem}
+  .intro-title{font-size:24px;font-weight:700;text-align:center;margin-bottom:0.6rem;color:#1a1a1a}
+  .intro-sub{font-size:15px;color:#666;text-align:center;line-height:1.75;margin-bottom:1.5rem}
+  .tag-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:1.75rem}
+  .tag{font-size:12px;padding:5px 14px;border-radius:20px;background:#EEEDFE;color:#534AB7;font-weight:500}
+  .name-label{font-size:14px;color:#555;margin-bottom:8px;display:block;font-weight:500}
+  .name-input{width:100%;padding:13px 16px;border:1.5px solid #e0ddd5;border-radius:14px;background:#fafafa;color:#1a1a1a;font-size:15px;outline:none;transition:border-color 0.15s;font-family:inherit;margin-bottom:1.5rem}
+  .name-input:focus{border-color:#7F77DD;background:#fff;box-shadow:0 0 0 3px rgba(127,119,221,0.12)}
+  .start-btn{display:block;width:100%;padding:14px;background:#7F77DD;color:#fff;border:none;border-radius:14px;font-size:16px;font-weight:600;cursor:pointer;transition:opacity 0.15s;font-family:inherit}
+  .start-btn:hover{opacity:0.88}
+  .r-emoji{font-size:52px;text-align:center;margin-bottom:0.75rem}
+  .r-code{font-size:20px;font-weight:700;color:#7F77DD;text-align:center;margin-bottom:4px;letter-spacing:0.1em}
+  .r-name{font-size:22px;font-weight:700;color:#1a1a1a;text-align:center;margin-bottom:6px}
+  .r-sub{font-size:14px;color:#7F77DD;text-align:center;margin-bottom:1.25rem;font-weight:500}
+  .r-greeting{font-size:16px;color:#1a1a1a;line-height:1.7;margin-bottom:0.6rem;font-weight:600}
+  .r-desc{font-size:14px;color:#555;line-height:1.75;margin-bottom:1rem}
+  .r-dir{font-size:14px;color:#444;line-height:1.75;padding:14px 18px;background:#f7f5ff;border-radius:0 12px 12px 0;border-left:3px solid #7F77DD;margin-bottom:1.25rem}
+  .r-dir strong{color:#534AB7}
+  .section-label{font-size:11px;font-weight:600;color:#999;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px}
+  .chip{display:inline-block;font-size:12px;padding:6px 12px;margin:3px;border-radius:20px;background:#f5f3ed;color:#444;border:1px solid #e8e4dc}
+  .axes-row{display:flex;gap:6px;flex-wrap:wrap}
+  .ax{font-size:12px;padding:5px 12px;border-radius:20px;border:1px solid}
+  .ax.hi{background:#EEEDFE;color:#534AB7;border-color:#AFA9EC;font-weight:500}
+  .ax.lo{background:#f5f3ed;color:#888;border-color:#e0dcd3}
+  .share-section{margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid #f0ede6;text-align:center}
+  .share-label{font-size:13px;color:#888;margin-bottom:10px}
+  .share-btn{display:inline-block;padding:10px 22px;background:#FEE500;color:#3C1E1E;border:none;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin:4px}
+  .share-btn:hover{opacity:0.88}
+  .share-btn.copy{background:#1a1a1a;color:#fff}
+  .retry-btn{display:block;width:100%;padding:12px;background:transparent;color:#888;border:1.5px solid #e8e4dc;border-radius:14px;font-size:14px;cursor:pointer;margin-top:10px;transition:all 0.15s;font-family:inherit}
+  .retry-btn:hover{border-color:#ccc;color:#333}
+  .toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:10px 20px;border-radius:10px;font-size:14px;opacity:0;transition:opacity 0.2s;pointer-events:none;z-index:9999;white-space:nowrap}
+  .toast.show{opacity:1}
+  @media(max-width:480px){body{padding:1rem 0.75rem}.card{padding:1.5rem 1.25rem;border-radius:16px}.q-text{font-size:16px}}
+</style>
+</head>
+<body>
+<div id="app">
+<div class="card">
+
+<div id="s-intro" class="screen active">
+  <div class="intro-emoji">📚</div>
+  <div class="intro-title">나의 인문학 유형은?</div>
+  <div class="intro-sub">철학·역사·심리·예술·사회…<br>당신은 어떤 렌즈로 세상을 바라보나요?<br>16가지 유형 중 딱 맞는 타입을 찾아드립니다.</div>
+  <div class="tag-row">
+    <span class="tag">약 3분 소요</span>
+    <span class="tag">12문항</span>
+    <span class="tag">16가지 유형</span>
+  </div>
+  <label class="name-label">먼저 닉네임을 알려주세요 :)</label>
+  <input class="name-input" id="nameInput" type="text" placeholder="예) 철학왕, 소크라테스, 익명" maxlength="12">
+  <button class="start-btn" onclick="startTest()">테스트 시작하기</button>
+</div>
+
+<div id="s-quiz" class="screen">
+  <div class="prog-wrap"><div class="prog-fill" id="prog"></div></div>
+  <div class="q-num" id="qnum"></div>
+  <div class="q-text" id="qtext"></div>
+  <div class="choices" id="choices"></div>
+  <button class="next-btn" id="nextBtn" onclick="nextQ()" disabled>다음</button>
+</div>
+
+<div id="s-result" class="screen">
+  <div id="result-content"></div>
+  <button class="retry-btn" onclick="restart()">처음부터 다시하기</button>
+</div>
+
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var Qs=[
+  {t:"오늘 밤, 넷플릭스에서 딱 하나의 콘텐츠만 고른다면?",c:[
+    {t:"말랑말랑하고 마음 편해지는 로맨틱 코미디",ax:{F:1,A:1}},
+    {t:"사건의 진실을 추적하는 역사/범죄 다큐멘터리",ax:{H:1,S:1}},
+    {t:"치밀한 두뇌 싸움이 돋보이는 추리 스릴러",ax:{T:1,J:1}},
+    {t:"사람 사는 냄새가 나는 리얼리티 관찰 예능",ax:{S:1,E:1}}
+  ]},
+  {t:"길가에서 두 사람이 격하게 논쟁하는 장면을 본다면?",c:[
+    {t:"'무슨 일이지?' 싸움의 원인과 논리를 파악해본다",ax:{H:1,T:1}},
+    {t:"'무섭다...' 불편한 에너지를 피해 얼른 자리를 뜬다",ax:{F:1,S:1}},
+    {t:"'공공장소에서 저러면 안 되지' 사회적 규칙을 떠올린다",ax:{E:1,J:1}},
+    {t:"저 사람들의 말투나 행동에서 성격을 유추해본다",ax:{N:1,T:1}}
+  ]},
+  {t:"여행 계획을 세울 때 나의 우선순위는?",c:[
+    {t:"동선과 시간을 효율적으로 짠 완벽한 일정표",ax:{J:1,S:1}},
+    {t:"그 나라의 숨겨진 이야기와 역사를 배우는 유적지",ax:{H:1,J:1}},
+    {t:"사진이 잘 나오는 예쁜 전시회와 갤러리/카페",ax:{A:1,F:1}},
+    {t:"예약 없이 가서 현지인처럼 살아보는 자유 여행",ax:{P:1,N:1}}
+  ]},
+  {t:"친구와 대화 중, 친구가 명백하게 틀린 사실을 말한다면?",c:[
+    {t:"그 부분은 틀렸다고 정확한 근거를 들어 말해준다",ax:{T:1,E:1}},
+    {t:"기분이 상할까 봐 그냥 웃으며 넘어간다",ax:{F:1,S:1}},
+    {t:"이 상황이 나중에 어떤 영향을 줄지 고려해본다",ax:{J:1,N:1}},
+    {t:"왜 저런 식으로 생각하게 됐을지 속마음을 상상한다",ax:{N:1,H:1}}
+  ]},
+  {t:"중고거래 상대방이 너무 친절하고 사정이 안타까워 보인다면?",c:[
+    {t:"정해진 금액은 약속! 깔끔하게 비즈니스적으로 거래한다",ax:{T:1,J:1}},
+    {t:"마음이 약해져서 덤을 더 주거나 금액을 깎아준다",ax:{F:1,P:1}},
+    {t:"훈훈한 사연을 기록하거나 주변에 알리고 싶어 한다",ax:{E:1,A:1}},
+    {t:"사람과 사람 사이의 인연에 대해 깊게 생각한다",ax:{F:1,N:1}}
+  ]},
+  {t:"인생 영화를 고를 때 당신의 확고한 취향은?",c:[
+    {t:"눈물을 쏙 빼는 감동적인 휴먼 스토리",ax:{F:1,S:1}},
+    {t:"구성이 완벽하고 반전이 소름 돋는 미스터리",ax:{T:1,J:1}},
+    {t:"영상미가 아름다워 넋 놓고 보게 되는 예술 영화",ax:{A:1,N:1}},
+    {t:"사회의 어두운 면을 날카롭게 고발하는 다큐",ax:{E:1,H:1}}
+  ]},
+  {t:"팀 프로젝트에서 내가 가장 빛나는 역할은?",c:[
+    {t:"논리와 팩트로 상대방을 설득하는 발표자",ax:{T:1,E:1}},
+    {t:"팀원들의 마음을 다독이는 분위기 메이커",ax:{F:1,S:1}},
+    {t:"일정 관리와 가이드라인을 잡는 꼼꼼한 리더",ax:{J:1,T:1}},
+    {t:"남들이 생각 못한 독창적인 기획안을 내는 아이디어 뱅크",ax:{N:1,P:1}}
+  ]},
+  {t:"디자인이 독특한 건물을 발견했을 때 나의 반응은?",c:[
+    {t:"'우와!' 소리와 함께 일단 사진부터 찍고 본다",ax:{A:1,E:1}},
+    {t:"이 건물은 누가, 어떤 의도로 지었을까 궁금해한다",ax:{H:1,S:1}},
+    {t:"공간 활용이 효율적이고 실용적일지 따져본다",ax:{T:1,J:1}},
+    {t:"이 건물이 주는 전체적인 영감과 분위기에 젖는다",ax:{A:1,F:1}}
+  ]},
+  {t:"자기 전, 가장 자주 하는 생각의 흐름은?",c:[
+    {t:"오늘 못한 일과 내일 꼭 해야 할 리스트업",ax:{J:1,S:1}},
+    {t:"'인간은 왜 사는가' 같은 철학적이고 깊은 고민",ax:{N:1,T:1}},
+    {t:"오늘 내 말투가 남에게 상처를 주진 않았을까 걱정",ax:{F:1,S:1}},
+    {t:"다음 휴가나 여행 때의 즐거운 계획 상상",ax:{P:1,A:1}}
+  ]},
+  {t:"유튜브 알고리즘에 다음 영상이 떴다. 가장 클릭하고 싶은 것은?",c:[
+    {t:"'세계사를 바꾼 결정적 전쟁의 순간 TOP 5'",ax:{H:1,J:1}},
+    {t:"'우리 사회가 침묵하고 있는 어두운 부조리'",ax:{E:1,T:1}},
+    {t:"'우리가 인간 관계에서 자꾸 상처받는 심리적 이유'",ax:{N:1,F:1}},
+    {t:"'위대한 예술가들은 세상을 어떻게 바라보는가'",ax:{A:1,P:1}}
+  ]},
+  {t:"만약 책을 한 권 쓴다면 어떤 주제를 고를까요?",c:[
+    {t:"삶의 의미와 내면의 성찰이 담긴 에세이",ax:{F:1,P:1}},
+    {t:"세상을 더 공정하게 만들기 위한 사회 비판서",ax:{E:1,T:1}},
+    {t:"잊혀서는 안 될 역사적 사건의 재조명",ax:{H:1,J:1}},
+    {t:"인간의 미묘한 감정과 관계를 다룬 소설",ax:{A:1,N:1}}
+  ]},
+  {t:"마지막 질문! 가장 가슴에 와닿는 명언을 고른다면?",c:[
+    {t:"'역사를 잊은 민족에게 미래는 없다'",ax:{H:1,J:1}},
+    {t:"'모든 예술은 감정의 언어이며 고백이다'",ax:{A:1,F:1}},
+    {t:"'불편한 질문을 던질 때 사회는 진보한다'",ax:{T:1,E:1}},
+    {t:"'나를 이해하는 것이 곧 세상을 이해하는 첫걸음이다'",ax:{N:1,F:1}}
+  ]}
+];
+
+var TYPES={
+  "TNHJ":{emoji:"🏛️",name:"역사 분석가",sub:"과거를 해독해 현재를 읽는 냉철한 연구자",desc:"팩트와 맥락을 함께 보는 분이네요. 감정보다 논리, 직관보다 근거를 중시하고 역사적 흐름 속에서 패턴을 찾아내는 타입입니다.",dir:"역사학·정치사상·국제관계를 엮어 <strong>역사 기반 정책 분석가</strong>나 연구자, 저널리스트로 나아가는 경로가 딱 맞아요.",courses:["근현대정치사상","경제학사","국제기구와 세계정치","비교정치론","현대사회에서 공과 사의 문제"]},
+  "TNHE":{emoji:"✊",name:"역사 활동가",sub:"역사의 교훈을 현재 변화에 연결하는 실천가",desc:"과거를 보면서 지금 뭔가 바꾸고 싶다는 마음이 드는 타입이에요. 역사를 박제된 지식이 아닌 살아있는 무기로 사용합니다.",dir:"역사·사회운동·인권 분야를 연결하는 <strong>NGO 활동가나 사회 비평가</strong>로 활동하면 빛날 수 있어요.",courses:["근현대정치사상","마이너리티 연구","현대사회사상의 이해","가치있는 삶과 윤리학","현대사회에서 공과 사의 문제"]},
+  "TNPJ":{emoji:"🔭",name:"철학적 탐구자",sub:"'왜?'라는 질문을 멈추지 않는 깊은 사유가",desc:"생각하는 걸 즐기고 추상적인 개념을 파고드는 타입이에요. 토론할 때 눈빛이 빛나고, 결론보다 과정을 더 즐깁니다.",dir:"철학·윤리학·정신분석을 엮어 깊이 있는 에세이나 비평을 쓰는 <strong>인문 지식인·연구자</strong> 스타일이 어울려요.",courses:["정신분석학과 철학","가치있는 삶과 윤리학","세계문학과 융합인문학의 이해","철학 키워드와 세계","현대사회사상의 이해"]},
+  "TNPE":{emoji:"🌐",name:"융합 혁신가",sub:"경계를 허물고 새로운 연결을 만드는 기획자",desc:"이것저것 연결하는 걸 좋아하고 기존 틀을 비틀고 싶어 하는 타입이에요. 학문의 경계가 답답하게 느껴질 때도 있을 거예요.",dir:"융합인문학·SF·미래연구 분야에서 새로운 아젠다를 만드는 <strong>인문학 기반 미래 기획자</strong>가 잘 맞아요.",courses:["SF인문학: 과학·인간·그리고 미래","융합인간학개론","융복합인문사회특수과제","신·인간·과학","대중문화와 문화연구"]},
+  "TFHJ":{emoji:"🤝",name:"공감하는 역사가",sub:"사람의 감정으로 역사를 읽는 따뜻한 기록자",desc:"역사 속 인물들의 감정과 고통에 공감하는 타입이에요. 사실을 외우기보다 '그 사람은 어떤 마음이었을까'를 먼저 생각합니다.",dir:"역사 교육, 구술사, 역사 소설·스토리텔링 분야에서 <strong>휴먼 히스토리언</strong>으로 활동하면 좋아요.",courses:["근현대정치사상","세계문학과 융합인문학의 이해","대중매체와 역사문화의 이해","현대문학과 사회","마이너리티 연구"]},
+  "TFHE":{emoji:"🌿",name:"사회 치유자",sub:"상처받은 사람과 구조 사이에서 다리를 놓는 사람",desc:"개인의 고통 뒤에 사회적 구조가 있다는 걸 직감하는 타입이에요. 감정적으로 공감하면서도 문제를 바꾸고 싶어 합니다.",dir:"사회복지·젠더학·상담을 연결해 현장에서 변화를 만드는 <strong>인문학 기반 사회복지사·활동가</strong>가 딱 맞아요.",courses:["마이너리티 연구","가치있는 삶과 윤리학","정신분석학과 철학","현대사회에서 공과 사의 문제","공공경제학"]},
+  "TFPJ":{emoji:"✍️",name:"감성 철학자",sub:"내면의 언어로 삶의 의미를 쓰는 작가형 사유가",desc:"생각이 많고 일기나 메모 쓰는 걸 즐기는 타입이에요. 감정과 철학이 만나는 지점에서 가장 빛나는 사람입니다.",dir:"에세이·문학 비평·인문 글쓰기 분야에서 자신만의 목소리를 내는 <strong>인문 에세이스트·작가</strong>로 나아가면 어울려요.",courses:["세계문학과 융합인문학의 이해","정신분석학과 철학","가치있는 삶과 윤리학","현대문학과 사회","철학 키워드와 세계"]},
+  "TFPE":{emoji:"🎭",name:"이야기 만드는 사람",sub:"감정과 사회를 이야기로 엮어내는 창작자",desc:"사람과 사회에 대한 감수성이 풍부하고 그걸 이야기나 콘텐츠로 표현하고 싶어 하는 타입이에요. 공감 능력이 창작의 원동력입니다.",dir:"문화 콘텐츠·시나리오·미디어 분야에서 사람들의 이야기를 담아내는 <strong>감성 스토리텔러·콘텐츠 크리에이터</strong>로 활동하면 빛나요.",courses:["현대문학과 사회","대중문화와 문화연구","문화 텍스트로 읽는 여성 콤플렉스","정신분석학과 철학","예술과 미학"]},
+  "SNHJ":{emoji:"📰",name:"현실 분석가",sub:"현장 데이터로 세상을 이해하는 실용주의자",desc:"추상보다 구체, 이론보다 현실을 중시하는 타입이에요. 실제 일어나는 일들을 정확히 파악하고 기록하는 데 강합니다.",dir:"저널리즘·사회학·공공정책 분야에서 현실을 정확히 분석하고 전달하는 <strong>팩트 기반 사회 분석가</strong>가 잘 맞아요.",courses:["경제학사","비교정치론","국제기구와 세계정치","대중매체와 역사문화의 이해","현대사회사상의 이해"]},
+  "SNHE":{emoji:"📢",name:"현장 변혁가",sub:"이론이 아닌 발로 뛰며 바꾸는 행동파 활동가",desc:"문제를 발견하면 직접 움직이는 타입이에요. 공부를 위한 공부보다 세상을 바꾸기 위한 공부가 더 잘 맞습니다.",dir:"시민단체·노동·환경·인권 분야에서 직접 현장을 바꾸는 <strong>행동하는 인문학자</strong>로 활동하면 가장 빛나요.",courses:["마이너리티 연구","공공경제학","현대사회에서 공과 사의 문제","가치있는 삶과 윤리학","비교정치론"]},
+  "SNPJ":{emoji:"🔬",name:"사회 과학자",sub:"데이터와 이론으로 사회를 해석하는 연구자",desc:"관찰하고 분석하는 걸 즐기는 타입이에요. 어떤 현상이든 '왜 그런가'를 논리적으로 설명하고 싶어 합니다.",dir:"사회학·경제학·정치학을 넘나들며 사회를 분석하는 <strong>학술 연구자나 싱크탱크 연구원</strong>이 잘 맞아요.",courses:["거시경제학","미시경제학원론","비교정치론","현대사회사상의 이해","융합인간학개론"]},
+  "SNPE":{emoji:"💡",name:"문화 기획자",sub:"트렌드를 읽고 새로운 판을 만드는 크리에이터",desc:"유행과 문화를 빠르게 캐치하고 거기서 기회를 보는 타입이에요. 아이디어가 많고 실행력도 있습니다.",dir:"문화 기획·미디어·광고 분야에서 트렌드를 선도하는 <strong>문화 기획자·콘텐츠 디렉터</strong>로 나아가면 딱이에요.",courses:["대중문화와 문화연구","대중매체와 역사문화의 이해","한국의 종교와 문화","융복합인문사회특수과제","현대사회사상의 이해"]},
+  "SFHJ":{emoji:"🕯️",name:"문화 전승자",sub:"소중한 것을 지키고 다음 세대에 전하는 사람",desc:"전통과 공동체를 소중히 여기는 타입이에요. 빠르게 변하는 세상 속에서 잊혀서는 안 될 것들을 붙잡으려 합니다.",dir:"문화유산·박물관·지역문화 분야에서 기억을 보존하고 전달하는 <strong>문화 큐레이터·아카이브 연구자</strong>가 어울려요.",courses:["한국의 종교와 문화","대중매체와 역사문화의 이해","세계문학과 융합인문학의 이해","근현대정치사상","융합인간학개론"]},
+  "SFHE":{emoji:"💬",name:"공동체 활동가",sub:"사람들 사이에서 연대를 만드는 따뜻한 실천가",desc:"혼자보다 함께를 좋아하고 주변 사람들의 삶이 나아지길 진심으로 원하는 타입이에요. 현장에서 에너지가 넘칩니다.",dir:"지역사회·교육·복지 분야에서 사람과 사람을 잇는 <strong>커뮤니티 활동가·사회 교육자</strong>로 활동하면 최고예요.",courses:["마이너리티 연구","가치있는 삶과 윤리학","공공경제학","현대사회에서 공과 사의 문제","한국의 종교와 문화"]},
+  "SFPJ":{emoji:"🎨",name:"감성 예술가",sub:"일상과 감정을 아름답게 담아내는 미적 감수성의 소유자",desc:"미적 감각이 뛰어나고 아름다움에서 의미를 찾는 타입이에요. 예술 작품 앞에서 멈추고 오래 느끼는 사람입니다.",dir:"예술·미학·문학을 엮어 창작하거나 비평하는 <strong>예술-인문 융합 창작자</strong>나 큐레이터가 잘 맞아요.",courses:["예술과 미학","세계문학과 융합인문학의 이해","현대문학과 사회","문화 텍스트로 읽는 여성 콤플렉스","대중문화와 문화연구"]},
+  "SFPE":{emoji:"🌈",name:"감성 크리에이터",sub:"공감과 창의력으로 세상에 색을 더하는 사람",desc:"따뜻한 감수성과 창의적인 에너지가 공존하는 타입이에요. 주변 사람들에게 긍정적인 영향을 주고 싶어 합니다.",dir:"문화 콘텐츠·SNS·브랜딩 분야에서 사람들의 마음을 움직이는 <strong>감성 콘텐츠 크리에이터</strong>로 나아가면 빛나요.",courses:["대중문화와 문화연구","예술과 미학","신·인간·과학","현대문학과 사회","융복합인문사회특수과제"]}
+};
+
+var AX_LABEL={T:"논리·분석",F:"공감·감성",N:"추상·상상",S:"현실·구체",H:"역사 지향",A:"예술 지향",E:"사회 참여",P:"자유·탐험",J:"구조·체계"};
+var cur=0,scores={T:0,F:0,N:0,S:0,H:0,A:0,E:0,P:0,J:0},sel=null,nickname="";
+
+function startTest(){
+  var v=document.getElementById('nameInput').value.trim();
+  nickname=v||"익명의 탐구자";
+  document.getElementById('s-intro').classList.remove('active');
+  document.getElementById('s-quiz').classList.add('active');
+  renderQ();
+}
+
+function renderQ(){
+  var q=Qs[cur];
+  document.getElementById('qnum').textContent=(cur+1)+' / '+Qs.length;
+  document.getElementById('prog').style.width=((cur/Qs.length)*100)+'%';
+  document.getElementById('qtext').textContent=q.t;
+  sel=null;
+  document.getElementById('nextBtn').disabled=true;
+  var c=document.getElementById('choices');
+  c.innerHTML='';
+  q.c.forEach(function(ch,i){
+    var b=document.createElement('button');
+    b.className='cbtn';b.textContent=ch.t;
+    b.onclick=(function(idx){return function(){pick(idx)}})(i);
+    c.appendChild(b);
+  });
+}
+
+function pick(i){
+  sel=i;
+  document.querySelectorAll('.cbtn').forEach(function(b,j){b.classList.toggle('sel',j===i)});
+  document.getElementById('nextBtn').disabled=false;
+}
+
+function nextQ(){
+  if(sel===null)return;
+  var ax=Qs[cur].c[sel].ax;
+  for(var k in ax)scores[k]+=ax[k];
+  cur++;
+  if(cur>=Qs.length)showResult();
+  else renderQ();
+}
+
+function getType(){
+  // 1. T vs F
+  var TF = scores.T >= scores.F ? 'T' : 'F';
+  // 2. N vs S
+  var NS = scores.N >= scores.S ? 'N' : 'S';
+  // 3. 역사(H) vs 예술/자유(P/A) -> 데이터 키값에 맞춰 P 또는 H로 출력
+  var HA = scores.H > (scores.A + scores.P) ? 'H' : 'P';
+  // 4. E vs J -> 동률일 때 분산을 위해 > 사용
+  var EJ = scores.E > scores.J ? 'E' : 'J';
+  
+  var code = TF + NS + HA + EJ;
+  
+  // 만약 생성된 코드가 TYPES에 없으면(예: HA가 P로 나옴) 
+  // 데이터 구조상 P와 A가 혼용되므로 안전하게 매칭
+  if(TYPES[code]) return [code, TYPES[code]];
+  
+  // 예외 매칭 (P를 A로 바꿔서 다시 확인)
+  var altCode = code.charAt(0) + code.charAt(1) + (code.charAt(2) === 'P' ? 'A' : 'P') + code.charAt(3);
+  if(TYPES[altCode]) return [altCode, TYPES[altCode]];
+
+  return ['TNHJ', TYPES['TNHJ']];
+}
+
+function showResult(){
+  document.getElementById('prog').style.width='100%';
+  document.getElementById('s-quiz').classList.remove('active');
+  document.getElementById('s-result').classList.add('active');
+  var res=getType();var code=res[0];var t=res[1];
+  var allAx=Object.entries(scores).sort(function(a,b){return b[1]-a[1]});
+  var maxV=allAx[0][1];
+  var axHtml=allAx.filter(function(e){return AX_LABEL[e[0]]}).map(function(e){
+    return '<span class="ax '+(e[1]===maxV?'hi':'lo')+'">'+AX_LABEL[e[0]]+'</span>'
+  }).join('');
+  var coursesHtml=t.courses.map(function(c){return '<span class="chip">'+c+'</span>'}).join('');
+  window._shareCode=code;window._shareName=t.name;
+  document.getElementById('result-content').innerHTML=
+    '<div class="r-emoji">'+t.emoji+'</div>'+
+    '<div class="r-code">'+code+'</div>'+
+    '<div class="r-name">'+t.name+'</div>'+
+    '<div class="r-sub">'+t.sub+'</div>'+
+    '<div style="border-top:1px solid #f0ede6;margin:1.1rem 0"></div>'+
+    '<div class="r-greeting">'+nickname+'님은 바로 이런 타입이에요!</div>'+
+    '<div class="r-desc">'+t.desc+'</div>'+
+    '<div class="r-dir">💡 '+nickname+'님, 이런 방향은 어떨까요?<br>'+t.dir+'</div>'+
+    '<div style="margin-bottom:1.25rem"><div class="section-label">추천 수업</div>'+coursesHtml+'</div>'+
+    '<div style="margin-bottom:0.5rem"><div class="section-label">나의 인문학 감수성</div><div class="axes-row">'+axHtml+'</div></div>'+
+    '<div class="share-section">'+
+    '<div class="share-label">친구에게 공유하기</div>'+
+    '<button class="share-btn" onclick="doShare()">공유하기</button>'+
+    '<button class="share-btn copy" onclick="doCopy()">링크 복사</button>'+
+    '</div>';
+}
+
+function doShare(){
+  var text=nickname+'님의 인문학 유형은 ['+window._shareCode+' '+window._shareName+']!\n나도 테스트 해보기 →';
+  if(navigator.share){
+    navigator.share({title:'나의 인문학 유형 테스트',text:text,url:location.href});
+  } else {doCopy();}
+}
+
+function doCopy(){
+  var text=nickname+'님의 인문학 유형은 ['+window._shareCode+' '+window._shareName+']!\n나도 테스트 해보기 → '+location.href;
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(text).then(function(){showToast('클립보드에 복사됐어요!')}).catch(function(){fallbackCopy(text)});
+  } else {fallbackCopy(text);}
+}
+
+function fallbackCopy(text){
+  var ta=document.createElement('textarea');
+  ta.value=text;ta.style.position='fixed';ta.style.opacity='0';
+  document.body.appendChild(ta);ta.select();
+  try{document.execCommand('copy');showToast('복사됐어요!');}catch(e){showToast('직접 URL을 복사해주세요.');}
+  document.body.removeChild(ta);
+}
+
+function showToast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show')},2200);
+}
+
+function restart(){
+  cur=0;scores={T:0,F:0,N:0,S:0,H:0,A:0,E:0,P:0,J:0};sel=null;nickname="";
+  document.getElementById('s-result').classList.remove('active');
+  document.getElementById('nameInput').value='';
+  document.getElementById('s-intro').classList.add('active');
+}
+
+document.getElementById('nameInput').addEventListener('keydown',function(e){if(e.key==='Enter')startTest()});
+</script>
+</body>
+</html>
