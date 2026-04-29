@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>나의 인문학 유형 테스트</title>
+<meta property="og:title" content="나의 인문학 유형 테스트">
+<meta property="og:description" content="16가지 유형으로 알아보는 나만의 인문학 타입">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans KR',sans-serif;background:#f5f4f0;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:2rem 1rem}
+#app{width:100%;max-width:600px}
+.card{background:#fff;border-radius:20px;padding:2rem;box-shadow:0 2px 20px rgba(0,0,0,0.07)}
+.screen{display:none}.screen.active{display:block}
+.prog-wrap{height:5px;background:#ede9e0;border-radius:3px;margin-bottom:1.25rem}
+.prog-fill{height:100%;background:#7F77DD;border-radius:3px;transition:width 0.3s ease}
+.q-num{font-size:13px;color:#888;margin-bottom:8px}
+.q-text{font-size:17px;font-weight:600;color:#1a1a1a;line-height:1.6;margin-bottom:1.25rem}
+.choices{display:flex;flex-direction:column;gap:10px}
+.cbtn{padding:14px 16px;border:1.5px solid #e8e5df;border-radius:14px;background:#fff;color:#333;font-size:14px;line-height:1.5;text-align:left;cursor:pointer;transition:all 0.15s;font-family:inherit}
+.cbtn:hover{background:#f3f1fe;border-color:#7F77DD}
+.cbtn.sel{background:#EEEDFE;border-color:#7F77DD;color:#3C3489;font-weight:500}
+.next-btn{display:block;width:100%;padding:14px;background:#7F77DD;color:#fff;border:none;border-radius:14px;font-size:16px;font-weight:600;cursor:pointer;margin-top:1.25rem;transition:opacity 0.15s;font-family:inherit}
+.next-btn:disabled{opacity:0.3;cursor:not-allowed}
+.next-btn:not(:disabled):hover{opacity:0.88}
+.intro-emoji{font-size:52px;text-align:center;margin-bottom:1rem}
+.intro-title{font-size:24px;font-weight:700;text-align:center;margin-bottom:0.6rem;color:#1a1a1a}
+.intro-sub{font-size:15px;color:#666;text-align:center;line-height:1.75;margin-bottom:1.5rem}
+.tag-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:1.75rem}
+.tag{font-size:12px;padding:5px 14px;border-radius:20px;background:#EEEDFE;color:#534AB7;font-weight:500}
+.name-label{font-size:14px;color:#555;margin-bottom:8px;display:block;font-weight:500}
+.name-input{width:100%;padding:13px 16px;border:1.5px solid #e0ddd5;border-radius:14px;background:#fafafa;color:#1a1a1a;font-size:15px;outline:none;transition:border-color 0.15s;font-family:inherit;margin-bottom:1.5rem}
+.name-input:focus{border-color:#7F77DD;background:#fff;box-shadow:0 0 0 3px rgba(127,119,221,0.12)}
+.start-btn{display:block;width:100%;padding:14px;background:#7F77DD;color:#fff;border:none;border-radius:14px;font-size:16px;font-weight:600;cursor:pointer;transition:opacity 0.15s;font-family:inherit}
+.start-btn:hover{opacity:0.88}
+.r-emoji{font-size:52px;text-align:center;margin-bottom:0.75rem}
+.r-code{font-size:20px;font-weight:700;color:#7F77DD;text-align:center;margin-bottom:4px;letter-spacing:0.1em}
+.r-name{font-size:22px;font-weight:700;color:#1a1a1a;text-align:center;margin-bottom:6px}
+.r-sub{font-size:14px;color:#7F77DD;text-align:center;margin-bottom:1.25rem;font-weight:500}
+.r-greeting{font-size:16px;color:#1a1a1a;line-height:1.7;margin-bottom:0.6rem;font-weight:600}
+.r-desc{font-size:14px;color:#555;line-height:1.75;margin-bottom:1rem}
+.r-dir{font-size:14px;color:#444;line-height:1.75;padding:14px 18px;background:#f7f5ff;border-radius:0 12px 12px 0;border-left:3px solid #7F77DD;margin-bottom:1.25rem}
+.section-label{font-size:11px;font-weight:600;color:#999;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px}
+.chip{display:inline-block;font-size:12px;padding:6px 12px;margin:3px;border-radius:20px;background:#f5f3ed;color:#444;border:1px solid #e8e4dc}
+.share-section{margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid #f0ede6;text-align:center}
+.share-btn{display:inline-block;padding:10px 22px;background:#1a1a1a;color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin:4px}
+.retry-btn{display:block;width:100%;padding:12px;background:transparent;color:#888;border:1.5px solid #e8e4dc;border-radius:14px;font-size:14px;cursor:pointer;margin-top:10px}
+</style>
+</head>
+<body>
+
+<div id="app">
+<div class="card">
+
+<div id="s-intro" class="screen active">
+<div class="intro-emoji">📚</div>
+<div class="intro-title">나의 인문학 유형은?</div>
+<div class="intro-sub">16문항으로 알아보는 나만의 인문학 타입</div>
+<label class="name-label">닉네임</label>
+<input class="name-input" id="nameInput" type="text" placeholder="닉네임">
+<button class="start-btn" onclick="startTest()">테스트 시작</button>
+</div>
+
+<div id="s-quiz" class="screen">
+<div class="prog-wrap"><div class="prog-fill" id="prog"></div></div>
+<div class="q-num" id="qnum"></div>
+<div class="q-text" id="qtext"></div>
+<div class="choices" id="choices"></div>
+<button class="next-btn" id="nextBtn" onclick="nextQ()" disabled>다음</button>
+</div>
+
+<div id="s-result" class="screen">
+<div id="result-content"></div>
+<button class="retry-btn" onclick="restart()">다시하기</button>
+</div>
+
+</div>
+</div>
+
+<script>
+
+var Qs=[
+{t:"친구가 '우리가 왜 착하게 살아야 할까?'라고 묻는다",c:[
+{t:"철학적으로 같이 토론한다",ax:{T:1,N:1}},
+{t:"그냥 넘긴다",ax:{S:1}},
+{t:"내 경험을 말한다",ax:{F:1}},
+{t:"관련 책을 찾아본다",ax:{T:1,H:1}}
+]},
+{t:"여행 스타일은?",c:[
+{t:"박물관",ax:{H:1}},
+{t:"예술 전시",ax:{A:1}},
+{t:"로컬 골목",ax:{S:1,E:1}},
+{t:"즉흥 여행",ax:{P:1}}
+]},
+{t:"에세이 주제 선택",c:[
+{t:"사회 문제",ax:{E:1,T:1}},
+{t:"예술 분석",ax:{A:1,F:1}},
+{t:"심리 통찰",ax:{F:1,N:1}},
+{t:"역사 사건",ax:{H:1}}
+]},
+{t:"넷플릭스 취향",c:[
+{t:"역사 다큐",ax:{H:1,S:1}},
+{t:"심리 스릴러",ax:{N:1,F:1}},
+{t:"사회 다큐",ax:{E:1}},
+{t:"SF 판타지",ax:{N:1,P:1}}
+]}
+]
+
+var TYPES={
+"TNHP":{emoji:"🏛️",name:"역사 분석가"},
+"TNHE":{emoji:"✊",name:"역사 활동가"},
+"TNAP":{emoji:"🔭",name:"철학 탐구자"},
+"TNAE":{emoji:"🌐",name:"융합 혁신가"},
+"TFHP":{emoji:"🤝",name:"공감하는 역사가"},
+"TFHE":{emoji:"🌿",name:"사회 치유자"},
+"TFAP":{emoji:"✍️",name:"감성 철학자"},
+"TFAE":{emoji:"🎭",name:"스토리 창작자"},
+"SNHP":{emoji:"📰",name:"현실 분석가"},
+"SNHE":{emoji:"📢",name:"현장 변혁가"},
+"SNAP":{emoji:"🔬",name:"사회 과학자"},
+"SNAE":{emoji:"💡",name:"문화 기획자"},
+"SFHP":{emoji:"🕯️",name:"문화 전승자"},
+"SFHE":{emoji:"💬",name:"공동체 활동가"},
+"SFAP":{emoji:"🎨",name:"감성 예술가"},
+"SFAE":{emoji:"🌈",name:"감성 크리에이터"}
+}
+
+var cur=0
+var scores={T:0,F:0,N:0,S:0,H:0,A:0,E:0,P:0}
+var sel=null
+var nickname=""
+
+function startTest(){
+nickname=document.getElementById('nameInput').value||"익명"
+document.getElementById('s-intro').classList.remove('active')
+document.getElementById('s-quiz').classList.add('active')
+renderQ()
+}
+
+function renderQ(){
+var q=Qs[cur]
+document.getElementById('qnum').textContent=(cur+1)+" / "+Qs.length
+document.getElementById('qtext').textContent=q.t
+sel=null
+document.getElementById('nextBtn').disabled=true
+
+var c=document.getElementById('choices')
+c.innerHTML=''
+
+q.c.forEach(function(ch,i){
+var b=document.createElement('button')
+b.className='cbtn'
+b.textContent=ch.t
+b.onclick=function(){pick(i)}
+c.appendChild(b)
+})
+}
+
+function pick(i){
+sel=i
+document.querySelectorAll('.cbtn').forEach((b,j)=>b.classList.toggle('sel',j===i))
+document.getElementById('nextBtn').disabled=false
+}
+
+function nextQ(){
+if(sel===null)return
+var ax=Qs[cur].c[sel].ax
+for(var k in ax){
+if(scores[k]!=null) scores[k]+=ax[k]
+}
+cur++
+if(cur>=Qs.length) showResult()
+else renderQ()
+}
+
+function getType(){
+
+var TF = scores.T>=scores.F ? 'T':'F'
+var NS = scores.N>=scores.S ? 'N':'S'
+var HA = scores.H>=scores.A ? 'H':'A'
+var EP = scores.E>=scores.P ? 'E':'P'
+
+var code = TF+NS+HA+EP
+
+return [code,TYPES[code]]
+}
+
+function showResult(){
+
+document.getElementById('s-quiz').classList.remove('active')
+document.getElementById('s-result').classList.add('active')
+
+var r=getType()
+var code=r[0]
+var t=r[1]
+
+document.getElementById('result-content').innerHTML=
+'<div class="r-emoji">'+t.emoji+'</div>'+
+'<div class="r-code">'+code+'</div>'+
+'<div class="r-name">'+t.name+'</div>'+
+'<div class="r-greeting">'+nickname+'님의 인문학 유형입니다</div>'
+}
+
+function restart(){
+location.reload()
+}
+
+</script>
+
+</body>
+</html>
