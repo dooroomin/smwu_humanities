@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>나의 일상 성향으로 보는 인문학 유형</title>
+<title>나의 인문학 유형은?</title>
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans KR',sans-serif;background:#f8f9fa;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:2rem 1rem}
@@ -39,8 +39,8 @@
 <div class="card">
   <div id="s-intro" class="screen active">
     <div class="intro-emoji">🏛️</div>
-    <div class="intro-title">인문학 감수성 테스트</div>
-    <div class="intro-sub">일상의 선택들로 알아보는<br>나만의 인문학적 시선은 어떤 모습일까요?</div>
+    <div class="intro-title">인문학 유형 테스트</div>
+    <div class="intro-sub">일상 속 선택들로 알아보는<br>나만의 인문학 유형은 무엇일까요?</div>
     <input class="name-input" id="nameInput" type="text" placeholder="이름 입력" maxlength="10">
     <button class="start-btn" onclick="startTest()">테스트 시작</button>
   </div>
@@ -62,7 +62,7 @@
 
 <script>
 var Qs=[
-  {t:"오늘 밤, 넷플릭스에서 딱 하나의 콘텐츠만 고른다면?",c:[
+  {t:"오늘 밤, 야식을 먹으면서 볼 딱 하나의 OTT 콘텐츠만 고른다면?",c:[
     {t:"달달한 로맨틱 코미디나 마음 편한 예능",ax:{F:1,A:1}},
     {t:"세계를 뒤흔든 사건을 다룬 역사/실화 다큐",ax:{H:1,S:1}},
     {t:"치밀한 트릭을 파헤치는 두뇌 싸움 스릴러",ax:{T:1,J:1}},
@@ -72,13 +72,13 @@ var Qs=[
     {t:"'도대체 왜 저래?' 싸움의 원인과 논리적 이유가 궁금하다",ax:{H:1,T:1}},
     {t:"'진짜 살벌하다...' 무서운 분위기 때문에 얼른 자리를 뜬다",ax:{F:1,S:1}},
     {t:"'공공장소에서 저러면 안 되지' 사회적 에티켓을 떠올린다",ax:{E:1,J:1}},
-    {t:"저 사람들의 말투나 행동에서 그들의 성격을 유추해본다",ax:{N:1,T:1}}
+    {t:"'평소에 화가 많나보네'저 사람들의 말투나 행동에서 그들의 성격을 유추해본다",ax:{N:1,T:1}}
   ]},
   {t:"해외여행 계획을 짤 때 가장 먼저 고려하는 것은?",c:[
     {t:"동선과 시간을 효율적으로 짠 완벽한 일정표",ax:{J:1,S:1}},
     {t:"그 나라에 가면 꼭 가봐야 할 역사적 유적지",ax:{H:1,J:1}},
     {t:"사진이 잘 나오는 예쁜 카페와 갤러리/공연",ax:{A:1,F:1}},
-    {t:"예약 없이 가서 현지 분위기에 몸을 맡기기",ax:{P:1,N:1}}
+    {t:"생각을 하지 않는다. 예약 없이 가서 현지 분위기에 몸을 맡기기",ax:{P:1,N:1}}
   ]},
   {t:"단체 카톡방에서 누군가 논란이 될 만한 실수를 했다면?",c:[
     {t:"그 부분은 명백히 틀렸다고 논리적으로 짚어준다",ax:{T:1,E:1}},
@@ -87,7 +87,7 @@ var Qs=[
     {t:"그 사람이 왜 그런 말을 했을지 그 배경을 상상해본다",ax:{N:1,H:1}}
   ]},
   {t:"중고거래 상대방이 너무 친절하고 사정이 안타까워 보인다.",c:[
-    {t:"정해진 금액은 약속! 깔끔하게 비즈니스적으로 거래한다",ax:{T:1,J:1}},
+    {t:"정해진 금액은 약속이지! 깔끔하게 비즈니스적으로 거래한다",ax:{T:1,J:1}},
     {t:"덤을 더 주거나 금액을 살짝 깎아주고 싶어 한다",ax:{F:1,P:1}},
     {t:"세상의 온기를 느꼈다며 커뮤니티에 후기를 남기고 싶다",ax:{E:1,A:1}},
     {t:"사람과 사람 사이의 인연에 대해 짧게 생각에 잠긴다",ax:{F:1,N:1}}
@@ -98,11 +98,11 @@ var Qs=[
     {t:"색감과 영상미가 너무 예뻐서 넋 놓고 보게 되는 영화",ax:{A:1,N:1}},
     {t:"현실의 부조리를 날카롭게 꼬집는 사회 비판물",ax:{E:1,H:1}}
   ]},
-  {t:"팀 프로젝트를 할 때 내가 맡고 싶은 역할은?",c:[
+  {t:"팀 프로젝트를 할 때 내가 주로 맡는 역할은?",c:[
     {t:"빈틈없는 자료조사와 논리 정연한 발표",ax:{T:1,E:1}},
     {t:"싸우지 않게 다독이고 칭찬하는 분위기 메이커",ax:{F:1,S:1}},
     {t:"전체 일정과 마감 기한을 칼같이 지키는 리더",ax:{J:1,T:1}},
-    {t:"남들이 안 하는 독특한 컨셉을 제안하는 아이디어 뱅크",ax:{N:1,P:1}}
+    {t:"남들이 안 하는 독특한 주제를 제안하는 아이디어 뱅크",ax:{N:1,P:1}}
   ]},
   {t:"길을 가다 건축 디자인이 독특한 건물을 발견했다!",c:[
     {t:"'우와 예쁘다!' 일단 카메라를 켜서 사진을 찍는다",ax:{A:1,E:1}},
