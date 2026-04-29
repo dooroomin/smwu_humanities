@@ -73,7 +73,7 @@
     <span class="tag">16가지 유형</span>
   </div>
   <label class="name-label">먼저 닉네임을 알려주세요 :)</label>
-  <input class="name-input" id="nameInput" type="text" placeholder="예) 눈송이, 니체, 하버마스" maxlength="12">
+  <input class="name-input" id="nameInput" type="text" placeholder="예) 눈송이, 칸트, 하버마스" maxlength="12">
   <button class="start-btn" onclick="startTest()">테스트 시작하기</button>
 </div>
 
@@ -96,6 +96,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
+// 가중치 로직 최적화
 var Qs=[
   {t:"오늘 밤, 넷플릭스에서 딱 하나의 콘텐츠만 고른다면?",c:[
     {t:"말랑말랑하고 마음 편해지는 로맨틱 코미디",ax:{F:1,A:1}},
@@ -104,10 +105,10 @@ var Qs=[
     {t:"사람 사는 냄새가 나는 리얼리티 관찰 예능",ax:{S:1,E:1}}
   ]},
   {t:"길가에서 두 사람이 격하게 논쟁하는 장면을 본다면?",c:[
-    {t:"'무슨 일이지?' 싸움의 원인과 논리를 파악해본다",ax:{H:1,T:1}},
+    {t:"'무슨 일이지?' 싸움의 원인과 논리를 파악해본다",ax:{T:1,H:1}},
     {t:"'무섭다...' 불편한 에너지를 피해 얼른 자리를 뜬다",ax:{F:1,S:1}},
-    {t:"'공공장소에서 저러면 안 되지' 사회적 규칙을 떠올린다",ax:{E:1,J:1}},
-    {t:"저 사람들의 말투나 행동에서 성격을 유추해본다",ax:{N:1,T:1}}
+    {t:"'공공장소에서 저러면 안 되지' 사회적 규칙을 떠올린다",ax:{J:1,E:1}},
+    {t:"저 사람들의 말투나 행동에서 성격을 유추해본다",ax:{N:1,F:1}}
   ]},
   {t:"여행 계획을 세울 때 나의 우선순위는?",c:[
     {t:"동선과 시간을 효율적으로 짠 완벽한 일정표",ax:{J:1,S:1}},
@@ -125,7 +126,7 @@ var Qs=[
     {t:"정해진 금액은 약속! 깔끔하게 비즈니스적으로 거래한다",ax:{T:1,J:1}},
     {t:"마음이 약해져서 덤을 더 주거나 금액을 깎아준다",ax:{F:1,P:1}},
     {t:"훈훈한 사연을 기록하거나 주변에 알리고 싶어 한다",ax:{E:1,A:1}},
-    {t:"사람과 사람 사이의 인연에 대해 깊게 생각한다",ax:{F:1,N:1}}
+    {t:"사람과 사람 사이의 인연에 대해 깊게 생각한다",ax:{N:1,F:1}}
   ]},
   {t:"인생 영화를 고를 때 당신의 확고한 취향은?",c:[
     {t:"눈물을 쏙 빼는 감동적인 휴먼 스토리",ax:{F:1,S:1}},
@@ -233,27 +234,23 @@ function nextQ(){
   else renderQ();
 }
 
+// 타입 결정 로직 수정 (핵심!)
 function getType(){
-  // 1. T vs F
   var TF = scores.T >= scores.F ? 'T' : 'F';
-  // 2. N vs S
   var NS = scores.N >= scores.S ? 'N' : 'S';
-  // 3. 역사(H) vs 예술/자유(P/A) -> 데이터 키값에 맞춰 P 또는 H로 출력
-  var HA = scores.H > (scores.A + scores.P) ? 'H' : 'P';
-  // 4. E vs J -> 동률일 때 분산을 위해 > 사용
-  var EJ = scores.E > scores.J ? 'E' : 'J';
+  // H(역사) 지표와 A/P(예술/자유) 지표를 비교하여 3번째 코드 결정
+  var HP = (scores.H) >= (scores.A + scores.P) ? 'H' : 'P';
+  var EJ = scores.E >= scores.J ? 'E' : 'J';
   
-  var code = TF + NS + HA + EJ;
+  var code = TF + NS + HP + EJ;
   
-  // 만약 생성된 코드가 TYPES에 없으면(예: HA가 P로 나옴) 
-  // 데이터 구조상 P와 A가 혼용되므로 안전하게 매칭
-  if(TYPES[code]) return [code, TYPES[code]];
-  
-  // 예외 매칭 (P를 A로 바꿔서 다시 확인)
-  var altCode = code.charAt(0) + code.charAt(1) + (code.charAt(2) === 'P' ? 'A' : 'P') + code.charAt(3);
-  if(TYPES[altCode]) return [altCode, TYPES[altCode]];
+  // 만약 생성된 코드에 P가 들어갔는데 데이터상에 A로 되어있는 경우 처리
+  if(!TYPES[code]) {
+      var altCode = code.replace('P', 'A');
+      if(TYPES[altCode]) return [altCode, TYPES[altCode]];
+  }
 
-  return ['TNHJ', TYPES['TNHJ']];
+  return [code, TYPES[code] || TYPES['TNHJ']];
 }
 
 function showResult(){
@@ -261,11 +258,14 @@ function showResult(){
   document.getElementById('s-quiz').classList.remove('active');
   document.getElementById('s-result').classList.add('active');
   var res=getType();var code=res[0];var t=res[1];
-  var allAx=Object.entries(scores).sort(function(a,b){return b[1]-a[1]});
+  
+  // 최고 점수 축 계산
+  var allAx=Object.entries(scores).filter(e => AX_LABEL[e[0]]).sort((a,b) => b[1]-a[1]);
   var maxV=allAx[0][1];
-  var axHtml=allAx.filter(function(e){return AX_LABEL[e[0]]}).map(function(e){
+  var axHtml=allAx.map(function(e){
     return '<span class="ax '+(e[1]===maxV?'hi':'lo')+'">'+AX_LABEL[e[0]]+'</span>'
   }).join('');
+
   var coursesHtml=t.courses.map(function(c){return '<span class="chip">'+c+'</span>'}).join('');
   window._shareCode=code;window._shareName=t.name;
   document.getElementById('result-content').innerHTML=
