@@ -231,41 +231,41 @@ function nextQ(){
 
 // 타입 결정 로직 (매칭 확률 분산 수정)
 function getType() {
-    // 1. 각 지표별 점수 확정
-    const { T, F, N, S, H, A, E, P, J } = scores;
+  // 1. 모든 지표를 배열로 변환
+  const data = [
+    { id: 'T', score: scores.T }, { id: 'F', score: scores.F },
+    { id: 'N', score: scores.N }, { id: 'S', score: scores.S },
+    { id: 'H', score: scores.H }, { id: 'P', score: scores.P + (scores.A || 0) }, // P와 A를 합산
+    { id: 'E', score: scores.E }, { id: 'J', score: scores.J }
+  ];
 
-    // 2. 4가지 축 결정 (동점 방지를 위해 미세한 가중치 부여)
-    const m1 = (T + 0.1 >= F) ? 'T' : 'F';
-    const m2 = (N + 0.1 >= S) ? 'N' : 'S';
-    // 3번 축: 역사(H) 지수가 예술(A)+탐험(P) 합보다 높아야만 H로 판정
-    const m3 = (H >= (A + P + 0.5)) ? 'H' : 'P';
-    const m4 = (E >= J) ? 'E' : 'J';
+  // 2. 점수 높은 순으로 정렬
+  data.sort((a, b) => b.score - a.score);
+  
+  // 3. 가장 높은 지표들 조합 (예: T, N, P, E 등)
+  const topFeatures = data.slice(0, 4).map(item => item.id);
+  
+  // 4. TYPES 데이터의 모든 키와 비교해서 '가장 많이 겹치는 놈' 찾기
+  let bestMatch = "";
+  let maxOverlap = -1;
 
-    const generatedCode = m1 + m2 + m3 + m4;
-    console.log("계산된 코드:", generatedCode); // 브라우저 콘솔에서 확인 가능
+  for (let key in TYPES) {
+    let overlap = 0;
+    // 내가 가진 상위 지표 4개가 TYPES의 키에 몇 개나 포함되어 있는지 확인
+    topFeatures.forEach(feat => {
+      if (key.includes(feat)) overlap++;
+    });
 
-    // 3. TYPES 데이터에서 정확히 일치하는 게 있는지 확인
-    if (TYPES[generatedCode]) {
-        return [generatedCode, TYPES[generatedCode]];
+    if (overlap > maxOverlap) {
+      maxOverlap = overlap;
+      bestMatch = key;
     }
+  }
 
-    // 4. (중요!) 만약 데이터에 없는 코드라면, 가장 유사한(키워드가 많이 겹치는) 타입을 검색
-    let bestMatch = "TNHJ"; // 최악의 경우 대비 기본값
-    let maxOverlap = -1;
+  console.log("실시간 상위 지표:", topFeatures);
+  console.log("최종 매칭된 키:", bestMatch);
 
-    for (let key in TYPES) {
-        let overlap = 0;
-        for (let i = 0; i < 4; i++) {
-            if (key[i] === generatedCode[i]) overlap++;
-        }
-        if (overlap > maxOverlap) {
-            maxOverlap = overlap;
-            bestMatch = key;
-        }
-    }
-
-    console.log("최종 매칭된 데이터 키:", bestMatch);
-    return [bestMatch, TYPES[bestMatch]];
+  return [bestMatch, TYPES[bestMatch]];
 }
 
 function showResult(){
